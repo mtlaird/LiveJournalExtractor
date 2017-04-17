@@ -6,11 +6,11 @@ import os
 
 
 class LiveJournalExport:
-    def __init__(self):
+    def __init__(self, config):
 
-        self.username = 'username'
-        self.password = 'password'
-        self.destination_directory = 'data'
+        self.destination_directory = config['destination_directory']
+        self.username = config['username']
+        self.password = config['password']
         self.session = requests.session()
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -64,7 +64,7 @@ class LiveJournalExport:
         if response.status_code != 200:
             return response  # This should raise an error
 
-        with open(self.destination_directory + '/' + destination_filename, 'w') as dest_file:
+        with open(self.destination_directory + '/entries/' + destination_filename, 'w') as dest_file:
             dest_file.write(response.content)
 
         return response
@@ -119,7 +119,7 @@ class LiveJournalExport:
 
     def get_post_ids_from_entry_file(self, filename):
 
-        file_path = self.destination_directory + '/' + filename
+        file_path = self.destination_directory + '/comments/' + filename
 
         with open(file_path, 'r') as csv_file:
             ids = []
@@ -132,11 +132,11 @@ class LiveJournalExport:
 
 class LiveJournalCsvReader:
 
-    def __init__(self, month, year):
+    def __init__(self, month, year, config):
 
-        self.destination_directory = 'entries'
-        self.username = 'username'
-        self.password = 'password'
+        self.destination_directory = config['destination_directory']
+        self.username = config['username']
+        self.password = config['password']
         self.year = year
         self.month = month
         self.entries = []
@@ -144,7 +144,7 @@ class LiveJournalCsvReader:
     def read_entries(self):
 
         filename = '{}-livejournal-entries-{}-{}.csv'.format(self.username, self.year, self.month)
-        file_path = self.destination_directory + '/' + filename
+        file_path = self.destination_directory + '/entries/' + filename
 
         with open(file_path, 'r') as csv_file:
             reader = csv.DictReader(csv_file)

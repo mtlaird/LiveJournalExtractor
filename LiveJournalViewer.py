@@ -1,12 +1,19 @@
 from flask import Flask
 app = Flask(__name__)
 import LiveJournalExport as lje
+import csv
 
 
 @app.route('/<int:year>/<int:month>')
 def homepage(year, month):
 
-    reader = lje.LiveJournalCsvReader(month=month, year=year)
+    data = []
+    with open('config.csv') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            data.append(row)
+
+    reader = lje.LiveJournalCsvReader(month=month, year=year, config=data[0])
     reader.read_entries()
     retstr = ''
 
