@@ -4,16 +4,21 @@ import LiveJournalExport as lje
 import csv
 
 
-@app.route('/<int:year>/<int:month>')
-def homepage(year, month):
+@app.route('/<string:username>/<int:year>/<int:month>')
+def homepage(username, year, month):
 
-    data = []
+    config = None
+
     with open('config.csv') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            data.append(row)
+            if row['username'] == username:
+                config = row
 
-    reader = lje.LiveJournalCsvReader(month=month, year=year, config=data[0])
+    if not config:
+        return None
+
+    reader = lje.LiveJournalCsvReader(month=month, year=year, config=config)
     reader.read_entries()
     retstr = ''
 
